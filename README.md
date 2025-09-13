@@ -12,31 +12,24 @@
 - and so on ... (Contribution on Issue board are welcome!)
 
 # Installation
+- Option A: pull a prebuilt image (older tag)
 ```bash
 docker pull jungin500/nvidia-sdk-manager-gui:1.4.1-7402
+```
+- Option B: build locally (uses sdkmanager 2.3.0-12617)
+```bash
+podman build -t nvidia-sdk-manager-gui:2.3.0-12617 .
 ```
 
 # Running (Linux)
 - You can use your own directory or docker volume to save SDK Manager download folder (sdkm_downloads)
 - You should run below command `start.sh` within Desktop Environment, or `(sdkmanager-gui:7): Gtk-WARNING **: 08:04:31.290: cannot open display: :0` (or similar) error could appear. You can `export DISPLAY=<your_desktop_id>` to workaround this issue.
 ```bash
-#!/bin/bash
-#
-# start.sh
-# Run NVIDIA SDK Manager (Linux)
-#
-
-sudo docker run \
-	-it --rm \
-	--net=host \
-	--privileged \
-	--ipc=host \
-	-v /dev/bus/usb:/dev/bus/usb/ \
-	-v /tmp/.X11-unix/:/tmp/.X11-unix \
-	-v $(pwd)/sdkm_downloads:/home/nvidia/Downloads/nvidia/sdkm_downloads \
-	-e DISPLAY=$DISPLAY \
-	jungin500/nvidia-sdk-manager-gui:1.4.1-7402
+./start.sh
 ```
+- The script auto-detects Podman (preferred) or Docker and adjusts flags. You can override:
+  - `IMAGE` to select a different tag (default: `nvidia-sdk-manager-gui:2.3.0-12617`)
+  - `SDKM_DIR` to change the local downloads directory (default: `./sdkm_downloads`)
 - next - **Login with QR Code** and Use SDK Manager! - You can login with QR code on right top corner of login screen. currently, login browser will not appear.
 
 # Running (Windows)
@@ -45,6 +38,21 @@ currently using within Linux is advised.
 - **Can** run in WSL1/2 Docker + Xming (https://sourceforge.net/projects/xming/)
 ```
 docker run -it --rm --net=host --privileged --ipc=host -e DISPLAY=<xming_host_address>:0.0 jungin500/nvidia-sdk-manager-gui:1.4.1-7402
+```
+
+## Podman notes
+- Rootless Podman: the `start.sh` script avoids `--privileged`, adds USB device mapping, and uses `:Z` on X11 volume for SELinux systems.
+- If you run manually, an example equivalent command is:
+```bash
+podman run -it --rm \
+	--net=host \
+	--ipc=host \
+	--device /dev/bus/usb \
+	--security-opt label=disable \
+	-v /tmp/.X11-unix:/tmp/.X11-unix:Z \
+	-v $(pwd)/sdkm_downloads:/home/nvidia/Downloads/nvidia/sdkm_downloads \
+	-e DISPLAY=$DISPLAY \
+	nvidia-sdk-manager-gui:2.3.0-12617
 ```
 
 # Q&A or Issues
