@@ -55,6 +55,19 @@ podman run -it --rm \
 	nvidia-sdk-manager-gui:2.3.0-12617
 ```
 
+## Ubuntu 20.04 variant
+- Build the Ubuntu 20.04-based image:
+```bash
+podman build -t nvidia-sdk-manager-gui:20.04 -f Dockerfile.20.04 .
+```
+- Run it via the start script by overriding the image:
+```bash
+IMAGE=nvidia-sdk-manager-gui:20.04 ./start.sh
+```
+- Notes:
+	- This variant also installs sdkmanager 2.3.0-12617 and includes all GUI/runtime dependencies and locales.
+	- You can keep downloads persistent with `SDKM_DIR` (defaults to `./sdkm_downloads`).
+
 # Q&A or Issues
 - Write down your issue to "Issue" board! I'll write find out ways to make it work, and respond ASAP. thanks.
 
